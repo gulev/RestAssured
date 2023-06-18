@@ -1,6 +1,7 @@
 package com.rest;
 
 import com.sun.org.apache.xerces.internal.util.PropertyState;
+import io.restassured.config.LogConfig;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import org.testng.Assert;
@@ -121,5 +122,62 @@ public class Test {
                         "workspaces[0]", hasEntry( "id", "e573297e-8f37-4cae-808d-381cc0372d25"),
                         "workspaces[0].name",allOf(startsWith("My"), containsString("Workspace"))
                 );
+    }
+
+    @org.testng.annotations.Test
+    public void request_response_logging(){
+        given().
+                baseUri("https://api.postman.com").
+                header("X-Api-Key","PMAK-6484d8fa58115f25366d9653-5cb2599c32b0c5f0c889823ee47aa8bcf8").
+                log().headers().
+        when().
+                get("/workspaces").
+        then().
+                log().body().
+                assertThat().statusCode(200);
+    }
+
+    //this test will fail on purpose as i want to test the ifError() function.
+    //i changed the X-API-KEY value so that it fails
+    @org.testng.annotations.Test
+    public void log_only_if_error(){
+        given().
+                baseUri("https://api.postman.com").
+                header("X-Api-Key","MAK-6484d8fa58115f25366d9653-5cb2599c32b0c5f0c889823ee47aa8bcf8").
+                log().headers().
+        when().
+                get("/workspaces").
+        then().
+                log().ifError().
+                assertThat().statusCode(200);
+    }
+
+    // the status code is on purpose 201 because i need it to fail in order to
+    // see the logging of the error that i use in config function
+    @org.testng.annotations.Test
+    public void log_only_if_validation_fails(){
+        given().
+                baseUri("https://api.postman.com").
+                header("X-Api-Key","PMAK-6484d8fa58115f25366d9653-5cb2599c32b0c5f0c889823ee47aa8bcf8").
+                config(config.logConfig(LogConfig.logConfig().enableLoggingOfRequestAndResponseIfValidationFails())).
+               // log().ifValidationFails().
+        when().
+                get("/workspaces").
+        then().
+              //  log().ifValidationFails().
+                assertThat().statusCode(201);
+    }
+
+    @org.testng.annotations.Test
+    public void logs_blacklist_header(){
+        given().
+                baseUri("https://api.postman.com").
+                header("X-Api-Key","PMAK-6484d8fa58115f25366d9653-5cb2599c32b0c5f0c889823ee47aa8bcf8").
+                config(config.logConfig(LogConfig.logConfig().blacklistHeader("X-Api-Key"))).
+                log().all().
+        when().
+                get("/workspaces").
+        then().
+                assertThat().statusCode(200);
     }
 }
