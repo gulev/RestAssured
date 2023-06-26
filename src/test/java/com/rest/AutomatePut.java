@@ -12,8 +12,7 @@ import static io.restassured.RestAssured.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class AutomatePost {
-
+public class AutomatePut {
     @BeforeClass
     public void beforeClass(){
         RequestSpecBuilder requestSpecBuilder = new RequestSpecBuilder();
@@ -31,36 +30,25 @@ public class AutomatePost {
     }
 
     @org.testng.annotations.Test
-    public void validate_post_request_bdd_style() {
+    public void validate_put_request_bdd_style() {
+        String workspaceId = "0eadfc01-0a4a-43c4-81b7-861529c35bef";
         String payload = "{\n" +
                 "    \"workspace\": {\n" +
-                "        \"name\": \"myFirstWorkspace1\",\n" +
+                "        \"name\": \"myFirstWorkspace33\",\n" +
                 "        \"type\": \"personal\",\n" +
                 "        \"description\": \"Rest Assured created this\"\n" +
                 "    }\n" +
                 "}";
+
         given().
                 body(payload).
         when().
-                post("/workspaces").
-        then().assertThat().body("workspace.name",equalTo("myFirstWorkspace1"));
-    }
+                put("/workspaces/"+workspaceId).
+        then().
+                log().all().
+                assertThat().
+                body("workspace.name",equalTo("myFirstWorkspace33"),
+                        "workspace.id", equalTo(workspaceId));
 
-    @org.testng.annotations.Test
-    public void validate_post_request_not_bdd_style() {
-        //if you want this to pass change the name to "something-that-you-want" because we already have
-        //myFirstWorkspace3
-        String payload = "{\n" +
-                "    \"workspace\": {\n" +
-                "        \"name\": \"myFirstWorkspace3\",\n" +
-                "        \"type\": \"personal\",\n" +
-                "        \"description\": \"Rest Assured created this\"\n" +
-                "    }\n" +
-                "}";
-
-        Response response = with().
-                body(payload).
-                post("/workspaces");
-        assertThat(response.path("workspace.name"),equalTo("myFirstWorkspace3"));
     }
 }
