@@ -7,10 +7,11 @@ import io.restassured.filter.log.LogDetail;
 import io.restassured.http.ContentType;
 import org.testng.annotations.BeforeClass;
 
-import static io.restassured.RestAssured.*;
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
 
-public class AutomatePut {
+public class AutomateDelete {
+
     @BeforeClass
     public void beforeClass(){
         RequestSpecBuilder requestSpecBuilder = new RequestSpecBuilder();
@@ -28,25 +29,16 @@ public class AutomatePut {
     }
 
     @org.testng.annotations.Test
-    public void validate_put_request_bdd_style() {
+    public void validate_delete_request_bdd_style() {
         String workspaceId = "0eadfc01-0a4a-43c4-81b7-861529c35bef";
-        String payload = "{\n" +
-                "    \"workspace\": {\n" +
-                "        \"name\": \"myFirstWorkspace33\",\n" +
-                "        \"type\": \"personal\",\n" +
-                "        \"description\": \"Rest Assured created this\"\n" +
-                "    }\n" +
-                "}";
 
         given().
-                body(payload).
-        when().
-                put("/workspaces/"+workspaceId).
-        then().
+                when().
+                delete("/workspaces/"+workspaceId).
+                then().
                 log().all().
                 assertThat().
-                body("workspace.name",equalTo("myFirstWorkspace33"),
-                        "workspace.id", equalTo(workspaceId));
+                body("workspace.id", equalTo(workspaceId));
 
     }
 }
