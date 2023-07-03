@@ -8,6 +8,8 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.testng.annotations.BeforeClass;
 
+import java.io.File;
+
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -48,19 +50,11 @@ public class AutomatePost {
 
     @org.testng.annotations.Test
     public void validate_post_request_not_bdd_style() {
-        //if you want this to pass change the name to "something-that-you-want" because we already have
-        //myFirstWorkspace3
-        String payload = "{\n" +
-                "    \"workspace\": {\n" +
-                "        \"name\": \"myFirstWorkspace3\",\n" +
-                "        \"type\": \"personal\",\n" +
-                "        \"description\": \"Rest Assured created this\"\n" +
-                "    }\n" +
-                "}";
+        File file = new File("src/main/resources/CreateWorkspacePayload.json");
 
         Response response = with().
-                body(payload).
+                body(file).
                 post("/workspaces");
-        assertThat(response.path("workspace.name"),equalTo("myFirstWorkspace3"));
+        assertThat(response.path("workspace.name"),equalTo("mySecondWorkspace"));
     }
 }
