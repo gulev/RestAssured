@@ -1,5 +1,7 @@
 package com.rest;
 
+import com.rest.pojo.workspace.Workspace;
+import com.rest.pojo.workspace.WorkspaceRoot;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
@@ -21,7 +23,7 @@ public class AutomatePost {
         RequestSpecBuilder requestSpecBuilder = new RequestSpecBuilder();
         requestSpecBuilder.setBaseUri("https://api.postman.com");
         requestSpecBuilder.addHeader("X-Api-Key",
-                "PMAK-6484d8fa58115f25366d9653-5cb2599c32b0c5f0c889823ee47aa8bcf8");
+                "PMAK-64c04b1f255e89003f0d653c-560d649cebc43700750efcb30f0276fe87");
         requestSpecBuilder.setContentType(ContentType.JSON);
         RestAssured.requestSpecification = requestSpecBuilder.build();
 
@@ -56,5 +58,25 @@ public class AutomatePost {
                 body(file).
                 post("/workspaces");
         assertThat(response.path("workspace.name"),equalTo("mySecondWorkspace"));
+    }
+
+
+
+    @org.testng.annotations.Test
+    public void create_workspace_using_pojo() {
+        Workspace workspace = new Workspace("jijibiji","personal","desc");
+        WorkspaceRoot workspaceRoot = new WorkspaceRoot(workspace);
+        WorkspaceRoot deserializedWorkspaceRoot =  given().
+                body(workspaceRoot).
+        when().
+                post("/workspaces").
+        then().
+                spec(responseSpecification).
+                extract().
+                response().
+                as(WorkspaceRoot.class);
+
+        assertThat(deserializedWorkspaceRoot.getWorkspace().getName(),
+                equalTo(workspaceRoot.getWorkspace().getName()));
     }
 }
